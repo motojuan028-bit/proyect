@@ -50,10 +50,9 @@ def login():
         .select("*")
         .eq("codigo", codigo)
         .eq("password", password)
-        .maybe_single()
         .execute()
     )
-    usuario = res.data
+    usuario = res.data[0] if res.data else None
 
     if not usuario:
         return jsonify({"error": "Código o contraseña incorrectos"}), 401
