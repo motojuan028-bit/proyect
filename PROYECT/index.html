@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TurnoUni — Beneficio Alimenticio</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0f0e0c;--bg2:#1a1915;--bg3:#242320;
+    --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);
+    --text:#f0ede6;--muted:#8a877e;
+    --accent:#d4a853;--accent2:#e8c47a;
+    --green:#4caf7d;--red:#e05252;--amber:#e8a020;
+    --r:12px;--r2:20px;
+  }
+  html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+
+  header{padding:1.1rem 2rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;background:rgba(15,14,12,0.92);backdrop-filter:blur(12px)}
+  .logo{font-family:'DM Serif Display',serif;font-size:1.25rem;color:var(--accent)}
+  .logo span{color:var(--text)}
+  .user-chip{display:flex;align-items:center;gap:.6rem;background:var(--bg3);border:1px solid var(--border);border-radius:999px;padding:.3rem .85rem .3rem .45rem;font-size:.8rem;color:var(--muted);cursor:pointer;transition:border-color .2s}
+  .user-chip:hover{border-color:var(--border2)}
+  .av{width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:600}
+
+  main{padding:2rem;max-width:580px;margin:0 auto;width:100%}
+  .screen{display:none;animation:fu .3s ease both}
+  .screen.active{display:block}
+  @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+  /* Login */
+  .hero{text-align:center;padding:2.5rem 0 2rem}
+  .hero .icon{width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,#2a2519,#3d3220);border:1px solid rgba(212,168,83,.3);display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;font-size:1.9rem}
+  .hero h1{font-family:'DM Serif Display',serif;font-size:1.9rem;font-weight:400;letter-spacing:-.03em;margin-bottom:.3rem}
+  .hero p{color:var(--muted);font-size:.88rem}
+
+  .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:1.6rem;margin-bottom:.9rem}
+  .card-title{font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:1.1rem}
+
+  label{display:block;font-size:.78rem;color:var(--muted);margin-bottom:.35rem;margin-top:.9rem}
+  label:first-of-type{margin-top:0}
+  input,select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.93rem;padding:.7rem .95rem;outline:none;transition:border-color .2s,box-shadow .2s}
+  input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(212,168,83,.1)}
+  input::placeholder{color:var(--muted)}
+  select{cursor:pointer;margin-top:.35rem}
+
+  .btn{display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;padding:.8rem;border:none;border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:.93rem;font-weight:500;cursor:pointer;transition:all .2s;margin-top:1.1rem}
+  .btn-primary{background:var(--accent);color:var(--bg)}
+  .btn-primary:hover{background:var(--accent2);transform:translateY(-1px)}
+  .btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none}
+  .btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text);margin-top:.6rem}
+  .btn-ghost:hover{background:var(--bg3)}
+  .btn-danger{background:transparent;border:1px solid rgba(224,82,82,.4);color:var(--red);margin-top:.6rem}
+  .btn-danger:hover{background:rgba(224,82,82,.07)}
+
+  .msg{padding:.7rem .95rem;border-radius:var(--r);font-size:.83rem;margin-top:.9rem;display:none}
+  .msg.show{display:block}
+  .msg-err{background:rgba(224,82,82,.1);border:1px solid rgba(224,82,82,.3);color:#f08080}
+  .msg-ok{background:rgba(76,175,125,.1);border:1px solid rgba(76,175,125,.3);color:#6dd4a0}
+
+  /* Dashboard */
+  .greeting{margin-bottom:1.5rem;padding-top:.4rem}
+  .greeting .hey{color:var(--muted);font-size:.83rem}
+  .greeting h2{font-family:'DM Serif Display',serif;font-size:1.6rem;font-weight:400;letter-spacing:-.02em;margin-top:.15rem}
+  .badge{display:inline-flex;align-items:center;gap:.32rem;padding:.28rem .7rem;border-radius:999px;font-size:.72rem;font-weight:500}
+  .badge::before{content:'';width:5px;height:5px;border-radius:50%}
+  .badge-green{background:rgba(76,175,125,.15);color:var(--green);border:1px solid rgba(76,175,125,.25)}
+  .badge-green::before{background:var(--green)}
+
+  /* Tabs tipo selector */
+  .tipo-tabs{display:flex;gap:.5rem;margin-bottom:1.1rem}
+  .tipo-tab{flex:1;padding:.65rem;border-radius:var(--r);border:1px solid var(--border);background:var(--bg3);color:var(--muted);font-size:.85rem;cursor:pointer;text-align:center;transition:all .2s}
+  .tipo-tab.active{border-color:var(--accent);background:rgba(212,168,83,.07);color:var(--accent)}
+
+  .section-label{font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.8rem}
+
+  /* Slots */
+  .slots{display:flex;flex-direction:column;gap:.4rem;margin-bottom:.9rem;max-height:300px;overflow-y:auto;padding-right:2px}
+  .slots::-webkit-scrollbar{width:4px}
+  .slots::-webkit-scrollbar-track{background:var(--bg3)}
+  .slots::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+  .slot{display:flex;align-items:center;gap:.9rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:.75rem .9rem;cursor:pointer;transition:border-color .2s,background .2s}
+  .slot:hover{border-color:var(--border2)}
+  .slot.selected{border-color:var(--accent);background:rgba(212,168,83,.06)}
+  .slot.full{opacity:.38;cursor:not-allowed;pointer-events:none}
+  .slot-time{font-weight:500;font-size:.9rem;min-width:105px}
+  .slot-bar-wrap{flex:1;height:3px;background:var(--bg);border-radius:2px;overflow:hidden}
+  .slot-bar{height:100%;border-radius:2px}
+  .slot-cupos{font-size:.75rem;color:var(--muted);min-width:68px;text-align:right}
+
+  /* QR */
+  .qr-card{background:var(--bg2);border:1px solid rgba(212,168,83,.25);border-radius:var(--r2);padding:1.75rem;text-align:center}
+  .qr-img-wrap{width:150px;height:150px;background:#fff;border-radius:var(--r);margin:0 auto 1.1rem;display:flex;align-items:center;justify-content:center;padding:7px}
+  .qr-img-wrap img{width:100%;height:100%}
+  .qr-franja{font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--accent);margin-bottom:.2rem}
+  .qr-fecha{font-size:.82rem;color:var(--muted);margin-bottom:.9rem}
+  .qr-token{font-size:.65rem;color:var(--muted);word-break:break-all;background:var(--bg3);padding:.45rem .7rem;border-radius:8px;margin-bottom:.9rem}
+
+  .skel{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg2) 50%,var(--bg3) 75%);background-size:200% 100%;animation:sk 1.4s infinite;border-radius:var(--r);height:50px;margin-bottom:.4rem}
+  @keyframes sk{to{background-position:-200% 0}}
+  .spinner{width:16px;height:16px;border:2px solid rgba(15,14,12,.3);border-top-color:var(--bg);border-radius:50%;animation:sp .7s linear infinite;display:none}
+  .loading .spinner{display:inline-block}
+  .loading .btn-text{display:none}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  hr.div{border:none;border-top:1px solid var(--border);margin:1.1rem 0}
+</style>
+</head>
+<body>
+
+<header id="header" style="display:none">
+  <div class="logo">Turno<span>Uni</span></div>
+  <div class="user-chip" onclick="logout()">
+    <div class="av" id="hdr-av">?</div>
+    <span id="hdr-nombre">–</span>&nbsp;·&nbsp;Salir
+  </div>
+</header>
+
+<main>
+
+  <!-- ══ LOGIN ══ -->
+  <div class="screen active" id="screen-login">
+    <div class="hero">
+      <div class="icon">🍽</div>
+      <h1>Beneficio alimenticio</h1>
+      <p>Reserva tu turno sin filas, sin esperas.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">Ingreso institucional</div>
+      <label>Código estudiantil</label>
+      <input type="text" id="login-codigo" placeholder="Ej: 2023140456">
+      <label>Contraseña</label>
+      <input type="password" id="login-pass" placeholder="••••••••">
+      <div class="msg msg-err" id="login-err"></div>
+      <button class="btn btn-primary" id="btn-login" onclick="doLogin()">
+        <span class="btn-text">Ingresar</span>
+        <div class="spinner"></div>
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ DASHBOARD ══ -->
+  <div class="screen" id="screen-dash">
+    <div class="greeting">
+      <div class="hey">Bienvenido de nuevo</div>
+      <h2 id="dash-nombre">–</h2>
+      <div style="margin-top:.4rem;display:flex;align-items:center;gap:.7rem">
+        <span class="badge badge-green">Beneficio activo</span>
+        <span style="font-size:.78rem;color:var(--muted)" id="dash-prog"></span>
+      </div>
+    </div>
+
+    <!-- Turno activo -->
+    <div id="turno-activo-wrap" style="display:none">
+      <div class="section-label">Tu turno de hoy</div>
+      <div class="qr-card">
+        <div class="qr-img-wrap"><img id="qr-img" src="" alt="QR"></div>
+        <div class="qr-franja" id="qr-franja">–</div>
+        <div class="qr-fecha" id="qr-fecha">Hoy</div>
+        <span class="badge badge-green" style="margin:0 auto .7rem">Turno confirmado</span>
+        <div class="qr-token" id="qr-token"></div>
+        <button class="btn btn-danger" id="btn-cancelar" onclick="cancelarTurno()">
+          <span class="btn-text">Cancelar turno</span>
+          <div class="spinner"></div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Reservar -->
+    <div id="reserva-wrap" style="display:none">
+      <div class="section-label">Reservar turno para hoy</div>
+      <div class="card">
+        <!-- Tabs tipo -->
+        <div class="tipo-tabs">
+          <div class="tipo-tab active" id="tab-almuerzo" onclick="setTipo('almuerzo')">🍱 Almuerzo<br><small style="font-size:.7rem;opacity:.7">11:00 – 15:00</small></div>
+          <div class="tipo-tab" id="tab-refrigerio" onclick="setTipo('refrigerio')">🥪 Refrigerio<br><small style="font-size:.7rem;opacity:.7">08:00 – 20:00</small></div>
+        </div>
+        <div class="section-label">Selecciona tu franja</div>
+        <div class="slots" id="slots-container">
+          <div class="skel"></div><div class="skel"></div><div class="skel"></div>
+        </div>
+        <div class="msg msg-err" id="reserva-err"></div>
+        <button class="btn btn-primary" id="btn-reservar" onclick="reservarTurno()" disabled>
+          <span class="btn-text">Confirmar reserva</span>
+          <div class="spinner"></div>
+        </button>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+const API = ''; // ← Pon aquí tu URL de Railway, ej: 'https://tu-app.up.railway.app'
+let USUARIO  = JSON.parse(localStorage.getItem('usuario') || 'null');
+let TIPO     = 'almuerzo';
+let SLOT_SEL = null;
+let TURNO_ID = null;
+
+window.addEventListener('DOMContentLoaded', () => {
+  if (USUARIO) mostrarDash();
+});
+
+// ── Helpers ────────────────────────────────────────────────────────────────────
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+function setLoading(btn, on){ btn.classList.toggle('loading',on); btn.disabled=on; }
+function showMsg(id,txt,type='err'){ const el=document.getElementById(id); el.textContent=txt; el.className=`msg msg-${type} show`; }
+function hideMsg(id){ document.getElementById(id).classList.remove('show'); }
+function cap(s){ return s?s[0].toUpperCase()+s.slice(1):''; }
+
+// ── Login ──────────────────────────────────────────────────────────────────────
+async function doLogin(){
+  const btn    = document.getElementById('btn-login');
+  const codigo = document.getElementById('login-codigo').value.trim();
+  const pass   = document.getElementById('login-pass').value.trim();
+  hideMsg('login-err');
+  if(!codigo||!pass){ showMsg('login-err','Ingresa tu código y contraseña.'); return; }
+  setLoading(btn, true);
+  try{
+    const res  = await fetch(`${API}/auth/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({codigo,password:pass})});
+    const data = await res.json();
+    if(!res.ok){ showMsg('login-err', data.error||'Credenciales incorrectas.'); return; }
+    USUARIO = {...data.usuario};
+    localStorage.setItem('usuario', JSON.stringify(USUARIO));
+    mostrarDash();
+  } catch(e){
+    showMsg('login-err','No se pudo conectar. ¿Está corriendo el servidor en http://127.0.0.1:5000?');
+  } finally { setLoading(btn,false); }
+}
+['login-codigo','login-pass'].forEach(id=>
+  document.getElementById(id).addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); })
+);
+
+// ── Dashboard ──────────────────────────────────────────────────────────────────
+function mostrarDash(){
+  document.getElementById('header').style.display='flex';
+  const nombre = USUARIO.nombre||'Estudiante';
+  document.getElementById('hdr-av').textContent     = nombre.split(' ').map(p=>p[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('hdr-nombre').textContent = nombre.split(' ').slice(0,2).join(' ');
+  document.getElementById('dash-nombre').textContent = nombre;
+  document.getElementById('dash-prog').textContent   = USUARIO.programa||'';
+  show('screen-dash');
+  cargarTurnoActivo();
+}
+
+// ── Turno activo ───────────────────────────────────────────────────────────────
+async function cargarTurnoActivo(){
+  try{
+    const res  = await fetch(`${API}/turnos/mi-turno?codigo=${encodeURIComponent(USUARIO.codigo)}`);
+    const data = await res.json();
+    if(data.turno && !data.turno.cancelado){
+      mostrarQR(data.turno);
+    } else {
+      document.getElementById('turno-activo-wrap').style.display='none';
+      document.getElementById('reserva-wrap').style.display='block';
+      cargarFranjas();
+    }
+  } catch(e){
+    document.getElementById('reserva-wrap').style.display='block';
+    cargarFranjas();
+  }
+}
+
+function mostrarQR(turno){
+  TURNO_ID = turno.id;
+  document.getElementById('turno-activo-wrap').style.display='block';
+  document.getElementById('reserva-wrap').style.display='none';
+  const f = turno.franja;
+  document.getElementById('qr-franja').textContent = `${f.hora_inicio} – ${f.hora_fin}`;
+  document.getElementById('qr-fecha').textContent  = `Hoy · ${cap(turno.tipo)}`;
+  document.getElementById('qr-token').textContent  = turno.token;
+  document.getElementById('qr-img').src = `${API}/turnos/${turno.token}/qr`;
+}
+
+// ── Tipo selector ──────────────────────────────────────────────────────────────
+function setTipo(tipo){
+  TIPO = tipo; SLOT_SEL = null;
+  document.getElementById('tab-almuerzo').classList.toggle('active', tipo==='almuerzo');
+  document.getElementById('tab-refrigerio').classList.toggle('active', tipo==='refrigerio');
+  document.getElementById('btn-reservar').disabled = true;
+  cargarFranjas();
+}
+
+// ── Franjas ────────────────────────────────────────────────────────────────────
+async function cargarFranjas(){
+  document.getElementById('slots-container').innerHTML='<div class="skel"></div><div class="skel"></div><div class="skel"></div>';
+  try{
+    const res  = await fetch(`${API}/franjas?tipo=${TIPO}`);
+    const data = await res.json();
+    renderSlots(data.franjas||[]);
+  } catch(e){
+    document.getElementById('slots-container').innerHTML='<p style="color:var(--muted);font-size:.83rem">Error cargando franjas.</p>';
+  }
+}
+
+function renderSlots(franjas){
+  const cont = document.getElementById('slots-container');
+  if(!franjas.length){ cont.innerHTML='<p style="color:var(--muted);font-size:.83rem;padding:.4rem 0">No hay franjas disponibles.</p>'; return; }
+  cont.innerHTML = franjas.map(f=>{
+    const pct  = Math.round((1 - f.cupos_disponibles / f.cupos_max) * 100);
+    const full = f.cupos_disponibles === 0;
+    const barC = pct>=90?'var(--red)':pct>=70?'var(--amber)':'var(--green)';
+    return `<div class="slot${full?' full':''}" onclick="selectSlot(${f.id},this)" data-id="${f.id}">
+      <span class="slot-time">${f.hora_inicio} – ${f.hora_fin}</span>
+      <div class="slot-bar-wrap"><div class="slot-bar" style="width:${pct}%;background:${barC}"></div></div>
+      <span class="slot-cupos" style="color:${full?'var(--red)':'var(--muted)'}">
+        ${full?'Sin cupos':f.cupos_disponibles+' cupos'}
+      </span>
+    </div>`;
+  }).join('');
+}
+
+function selectSlot(id,el){
+  document.querySelectorAll('.slot').forEach(s=>s.classList.remove('selected'));
+  el.classList.add('selected');
+  SLOT_SEL=id;
+  document.getElementById('btn-reservar').disabled=false;
+  hideMsg('reserva-err');
+}
+
+// ── Reservar ───────────────────────────────────────────────────────────────────
+async function reservarTurno(){
+  if(!SLOT_SEL){ showMsg('reserva-err','Selecciona una franja horaria.'); return; }
+  const btn = document.getElementById('btn-reservar');
+  hideMsg('reserva-err');
+  setLoading(btn, true);
+  try{
+    const res  = await fetch(`${API}/turnos`,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({franja_id:SLOT_SEL, tipo:TIPO, codigo_usuario:USUARIO.codigo})});
+    const data = await res.json();
+    if(!res.ok){ showMsg('reserva-err', data.error||'No se pudo reservar.'); return; }
+    mostrarQR(data.turno);
+  } catch(e){
+    showMsg('reserva-err','Error de conexión con el servidor.');
+  } finally { setLoading(btn,false); }
+}
+
+// ── Cancelar ───────────────────────────────────────────────────────────────────
+async function cancelarTurno(){
+  if(!TURNO_ID) return;
+  if(!confirm('¿Confirmas cancelar tu turno de hoy?')) return;
+  const btn = document.getElementById('btn-cancelar');
+  setLoading(btn, true);
+  try{
+    const res = await fetch(`${API}/turnos/${TURNO_ID}/cancelar`,{method:'POST'});
+    if(res.ok){
+      TURNO_ID=null; SLOT_SEL=null;
+      document.getElementById('turno-activo-wrap').style.display='none';
+      document.getElementById('reserva-wrap').style.display='block';
+      document.getElementById('btn-reservar').disabled=true;
+      cargarFranjas();
+    }
+  } catch(e){ alert('Error al cancelar.'); }
+  finally{ setLoading(btn,false); }
+}
+
+// ── Logout ─────────────────────────────────────────────────────────────────────
+function logout(){
+  if(!confirm('¿Cerrar sesión?')) return;
+  localStorage.clear();
+  USUARIO=null;
+  document.getElementById('header').style.display='none';
+  show('screen-login');
+}
+</script>
+</body>
+</html>
